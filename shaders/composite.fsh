@@ -21,7 +21,7 @@ void main() {
     vec3 normal = normalize(texture2D(colortex1, uv).rgb * 2.0f - 1.0f);
     float ndotl = max(dot(normal, normalize(sunPosition)), 0.0f);
 
-    vec3 diffuse = albedo * (ndotl);
+    vec3 diffuse = albedo * (ndotl + Ambient);
 
     /* DRAWBUFFERS:0 */
     gl_FragData[0] = vec4(diffuse, 1.0f);
