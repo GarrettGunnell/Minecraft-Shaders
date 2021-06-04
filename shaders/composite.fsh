@@ -22,7 +22,7 @@ const int colortex2Format = RGB16;
 */
 
 const float sunPathRotation = -40.0f;
-const int shadowMapResolution = 1024;
+const int shadowMapResolution = 2048;
 const float shadowBias = 0.001f;
 
 const float Ambient = 0.1f;
@@ -56,8 +56,8 @@ vec3 DetermineLightColor(in vec2 lightmap) {
     return torchLighting + skyLighting;
 }
 
-float GetShadow(void) {
-    vec3 clipSpace = vec3(uv, texture2D(depthtex0, uv).r) * 2.0f - 1.0f;
+float GetShadow(float depth) {
+    vec3 clipSpace = vec3(uv, depth) * 2.0f - 1.0f;
     vec4 viewW = gbufferProjectionInverse * vec4(clipSpace, 1.0f);
     vec3 view = viewW.xyz / viewW.w;
 
@@ -72,6 +72,12 @@ float GetShadow(void) {
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
     albedo = pow(albedo, vec3(2.2f)); // gamma correct
+    float depth = texture2D(depthtex0, uv).r;
+
+    if (depth == 1.0f) {
+        gl_FragData[0] = vec4(albedo, 1.0f);
+        return;
+    }
 
     vec3 normal = texture2D(colortex1, uv).rgb;
     normal = normal * 2.0f - 1.0f; // unpack normal
@@ -81,7 +87,7 @@ void main() {
 
     float ndotl = max(dot(normal, normalize(sunPosition)), 0.0f);
 
-    vec3 diffuse = albedo * (lightColor + ndotl * GetShadow() + Ambient);
+    vec3 diffuse = albedo * (lightColor + ndotl * GetShadow(depth) + Ambient);
 
     /* DRAWBUFFERS:0 */
     gl_FragData[0] = vec4(diffuse, 1.0f);
