@@ -18,6 +18,16 @@ const float sunPathRotation = -40.0f;
 
 const float Ambient = 0.1f;
 
+vec3 DetermineLightColor(in vec2 lightmap) {
+    vec3 torchColor = vec3(1.0f, 0.25f, 0.08f);
+    vec3 skyColor = vec3(0.05f, 0.15f, 0.3f);
+
+    vec3 torchLighting = lightmap.x * torchColor;
+    vec3 skyLighting = lightmap.y * skyColor;
+
+    return torchLighting + skyLighting;
+}
+
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
     albedo = pow(albedo, vec3(2.2f)); // gamma correct
@@ -26,12 +36,13 @@ void main() {
     normal = normal * 2.0f - 1.0f; // unpack normal
 
     vec2 lightmap = texture2D(colortex2, uv).rg;
+    vec3 lightColor = DetermineLightColor(lightmap);
 
     float ndotl = max(dot(normal, normalize(sunPosition)), 0.0f);
 
-    vec3 diffuse = albedo * (ndotl + Ambient);
+    vec3 diffuse = albedo * (lightColor + ndotl + Ambient);
 
     /* DRAWBUFFERS:0 */
-    gl_FragData[0] = vec4(pow(diffuse, vec3(1.0f / 2.2f)), 1.0f);
-    gl_FragData[0] = vec4(lightmap.rg, 0, 0);
+    gl_FragData[0] = vec4(diffuse, 1.0f);
+    //gl_FragData[0] = vec4(lightmap.rg, 0, 0);
 }
