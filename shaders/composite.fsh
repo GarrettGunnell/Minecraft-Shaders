@@ -7,6 +7,13 @@ uniform vec3 sunPosition;
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
 uniform sampler2D colortex2;
+uniform sampler2D depthtex0;
+uniform sampler2D shadowtex0;
+
+uniform mat4 gbufferProjectionInverse;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 shadowModelView;
+uniform mat4 shadowProjection;
 
 /*
 const int colortex0Format = RGBA16;
@@ -15,6 +22,9 @@ const int colortex2Format = RGB16;
 */
 
 const float sunPathRotation = -40.0f;
+const int shadowMapResolution = 1024;
+const float shadowBias = 0.001f;
+
 const float Ambient = 0.1f;
 
 float AdjustTorchMap(in float torch) {
@@ -46,6 +56,19 @@ vec3 DetermineLightColor(in vec2 lightmap) {
     return torchLighting + skyLighting;
 }
 
+float GetShadow(void) {
+    vec3 clipSpace = vec3(uv, texture2D(depthtex0, uv).r) * 2.0f - 1.0f;
+    vec4 viewW = gbufferProjectionInverse * vec4(clipSpace, 1.0f);
+    vec3 view = viewW.xyz / viewW.w;
+
+    vec4 world = gbufferModelViewInverse * vec4(view, 1.0f);
+    vec4 shadowSpace = shadowProjection * shadowModelView * world;
+
+    vec3 uv = shadowSpace.xyz * 0.5f + 0.5f;
+
+    return step(uv.z - shadowBias, texture2D(shadowtex0, uv.xy).r);
+}
+
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
     albedo = pow(albedo, vec3(2.2f)); // gamma correct
@@ -58,7 +81,7 @@ void main() {
 
     float ndotl = max(dot(normal, normalize(sunPosition)), 0.0f);
 
-    vec3 diffuse = albedo * (lightColor + ndotl + Ambient);
+    vec3 diffuse = albedo * (lightColor + ndotl * GetShadow() + Ambient);
 
     /* DRAWBUFFERS:0 */
     gl_FragData[0] = vec4(diffuse, 1.0f);
