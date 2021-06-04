@@ -26,7 +26,7 @@ const int colortex2Format = RGB16;
 */
 
 const float sunPathRotation = -40.0f;
-const int shadowMapResolution = 2048;
+const int shadowMapResolution = 4096;
 const float shadowBias = 0.001f;
 
 #define SHADOW_SAMPLES 1
