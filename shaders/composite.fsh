@@ -6,10 +6,12 @@ uniform vec3 sunPosition;
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
+uniform sampler2D colortex2;
 
 /*
 const int colortex0Format = RGBA16;
 const int colortex1Format = RGBA16;
+const int colortex2Format = RGB16;
 */
 
 const float sunPathRotation = -40.0f;
@@ -23,10 +25,13 @@ void main() {
     vec3 normal = texture2D(colortex1, uv).rgb;
     normal = normal * 2.0f - 1.0f; // unpack normal
 
+    vec2 lightmap = texture2D(colortex2, uv).rg;
+
     float ndotl = max(dot(normal, normalize(sunPosition)), 0.0f);
 
     vec3 diffuse = albedo * (ndotl + Ambient);
 
     /* DRAWBUFFERS:0 */
     gl_FragData[0] = vec4(pow(diffuse, vec3(1.0f / 2.2f)), 1.0f);
+    gl_FragData[0] = vec4(lightmap.rg, 0, 0);
 }
