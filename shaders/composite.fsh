@@ -25,8 +25,12 @@ const int colortex2Format = RGB16;
 */
 
 const float sunPathRotation = -40.0f;
-const int shadowMapResolution = 1024;
+const int shadowMapResolution = 2048;
 const float shadowBias = 0.001f;
+
+#define SHADOW_SAMPLES 4
+const int shadowSamplesPerSize = 2 * SHADOW_SAMPLES + 1;
+const int totalSamples = shadowSamplesPerSize * shadowSamplesPerSize;
 
 const float Ambient = 0.1f;
 
@@ -84,7 +88,17 @@ vec3 GetShadow(float depth) {
     shadowSpace.xy = DistortPosition(shadowSpace.xy);
     vec3 uv = shadowSpace.xyz * 0.5f + 0.5f;
 
-    return shadowColor(uv);
+    vec3 shadowAccum = vec3(0.0f);
+    for (int x = -SHADOW_SAMPLES; x <= SHADOW_SAMPLES; ++x) {
+        for (int y = -SHADOW_SAMPLES; y <= SHADOW_SAMPLES; ++y) {
+            vec2 offset = vec2(x, y) / shadowMapResolution;
+            vec3 currentSampleCoordinate = vec3(uv.xy + offset, uv.z);
+            shadowAccum += shadowColor(currentSampleCoordinate);
+        }
+    }
+
+    shadowAccum /= totalSamples;
+    return shadowAccum;
 }
 
 void main() {
