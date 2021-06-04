@@ -4,7 +4,7 @@ varying vec2 uv;
 uniform sampler2D colortex0;
 
 void main() {
-    vec3 Color = pow(texture2D(colortex0, uv).rgb, vec3(1/2.2));
+    vec3 Color = texture2D(colortex0, uv).rgb;
 
     gl_FragColor = vec4(Color, 1.0f);
 }
