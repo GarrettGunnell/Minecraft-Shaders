@@ -12,6 +12,7 @@ uniform sampler2D depthtex0;
 uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
+uniform sampler2D noisetex;
 
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
@@ -28,9 +29,11 @@ const float sunPathRotation = -40.0f;
 const int shadowMapResolution = 2048;
 const float shadowBias = 0.001f;
 
-#define SHADOW_SAMPLES 4
+#define SHADOW_SAMPLES 1
 const int shadowSamplesPerSize = 2 * SHADOW_SAMPLES + 1;
 const int totalSamples = shadowSamplesPerSize * shadowSamplesPerSize;
+
+const int noiseTextureResolution = 128;
 
 const float Ambient = 0.1f;
 
@@ -86,13 +89,18 @@ vec3 GetShadow(float depth) {
     vec4 shadowSpace = shadowProjection * shadowModelView * world;
 
     shadowSpace.xy = DistortPosition(shadowSpace.xy);
-    vec3 uv = shadowSpace.xyz * 0.5f + 0.5f;
+    vec3 shadowUV = shadowSpace.xyz * 0.5f + 0.5f;
+
+    float randomAngle = texture2D(noisetex, uv * 20.0f).r * 100.0f;
+    float cosTheta = cos(randomAngle);
+    float sinTheta = sin(randomAngle);
+    mat2 rotation = mat2(cosTheta, -sinTheta, sinTheta, cosTheta) / shadowMapResolution;
 
     vec3 shadowAccum = vec3(0.0f);
     for (int x = -SHADOW_SAMPLES; x <= SHADOW_SAMPLES; ++x) {
         for (int y = -SHADOW_SAMPLES; y <= SHADOW_SAMPLES; ++y) {
-            vec2 offset = vec2(x, y) / shadowMapResolution;
-            vec3 currentSampleCoordinate = vec3(uv.xy + offset, uv.z);
+            vec2 offset = rotation * vec2(x, y);
+            vec3 currentSampleCoordinate = vec3(shadowUV.xy + offset, shadowUV.z);
             shadowAccum += shadowColor(currentSampleCoordinate);
         }
     }
