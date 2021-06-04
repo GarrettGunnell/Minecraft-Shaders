@@ -10,6 +10,8 @@ uniform sampler2D colortex1;
 uniform sampler2D colortex2;
 uniform sampler2D depthtex0;
 uniform sampler2D shadowtex0;
+uniform sampler2D shadowtex1;
+uniform sampler2D shadowcolor0;
 
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
@@ -57,7 +59,21 @@ vec3 DetermineLightColor(in vec2 lightmap) {
     return torchLighting + skyLighting;
 }
 
-float GetShadow(float depth) {
+float Visible(in sampler2D shadowMap, in vec3 uv) {
+    return step(uv.z - shadowBias, texture2D(shadowMap, uv.xy).r);
+}
+
+vec3 shadowColor(in vec3 uv) {
+    float shadowVisibility0 = Visible(shadowtex0, uv);
+    float shadowVisibility1 = Visible(shadowtex1, uv);
+
+    vec4 shadowColor0 = texture2D(shadowcolor0, uv.xy);
+    vec3 transmittedColor = shadowColor0.rgb * (1.0f - shadowColor0.a);
+
+    return mix(transmittedColor * shadowVisibility1, vec3(1.0f), shadowVisibility0);
+}
+
+vec3 GetShadow(float depth) {
     vec3 clipSpace = vec3(uv, depth) * 2.0f - 1.0f;
     vec4 viewW = gbufferProjectionInverse * vec4(clipSpace, 1.0f);
     vec3 view = viewW.xyz / viewW.w;
@@ -68,7 +84,7 @@ float GetShadow(float depth) {
     shadowSpace.xy = DistortPosition(shadowSpace.xy);
     vec3 uv = shadowSpace.xyz * 0.5f + 0.5f;
 
-    return step(uv.z - shadowBias, texture2D(shadowtex0, uv.xy).r);
+    return shadowColor(uv);
 }
 
 void main() {
