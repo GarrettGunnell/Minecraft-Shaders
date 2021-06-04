@@ -15,8 +15,26 @@ const int colortex2Format = RGB16;
 */
 
 const float sunPathRotation = -40.0f;
-
 const float Ambient = 0.1f;
+
+float AdjustTorchMap(in float torch) {
+    const float K = 2.0f;
+    const float P = 5.06f;
+
+    return K * pow(torch, P);
+}  
+
+float AdjustSkyMap(in float sky) {
+    return sky * sky * sky * sky;
+}
+
+vec2 AdjustLightmap(in vec2 lightmap) {
+    vec2 newLightmap;
+    newLightmap.r = AdjustTorchMap(lightmap.r);
+    newLightmap.g = AdjustSkyMap(lightmap.g);
+
+    return newLightmap;
+}
 
 vec3 DetermineLightColor(in vec2 lightmap) {
     vec3 torchColor = vec3(1.0f, 0.25f, 0.08f);
@@ -35,7 +53,7 @@ void main() {
     vec3 normal = texture2D(colortex1, uv).rgb;
     normal = normal * 2.0f - 1.0f; // unpack normal
 
-    vec2 lightmap = texture2D(colortex2, uv).rg;
+    vec2 lightmap = AdjustLightmap(texture2D(colortex2, uv).rg);
     vec3 lightColor = DetermineLightColor(lightmap);
 
     float ndotl = max(dot(normal, normalize(sunPosition)), 0.0f);
