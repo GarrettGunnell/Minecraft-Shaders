@@ -1,4 +1,5 @@
 #version 120
+#include "distort.glsl"
 
 varying vec2 uv;
 
@@ -22,7 +23,7 @@ const int colortex2Format = RGB16;
 */
 
 const float sunPathRotation = -40.0f;
-const int shadowMapResolution = 2048;
+const int shadowMapResolution = 1024;
 const float shadowBias = 0.001f;
 
 const float Ambient = 0.1f;
@@ -64,6 +65,7 @@ float GetShadow(float depth) {
     vec4 world = gbufferModelViewInverse * vec4(view, 1.0f);
     vec4 shadowSpace = shadowProjection * shadowModelView * world;
 
+    shadowSpace.xy = DistortPosition(shadowSpace.xy);
     vec3 uv = shadowSpace.xyz * 0.5f + 0.5f;
 
     return step(uv.z - shadowBias, texture2D(shadowtex0, uv.xy).r);
