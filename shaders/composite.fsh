@@ -4,6 +4,7 @@
 varying vec2 uv;
 
 uniform vec3 sunPosition;
+uniform vec3 moonPosition;
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
