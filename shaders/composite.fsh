@@ -4,7 +4,7 @@
 varying vec2 uv;
 
 uniform vec3 sunPosition;
-uniform vec3 moonPosition;
+uniform vec3 upPosition;
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
@@ -128,7 +128,13 @@ void main() {
     vec2 lightmap = AdjustLightmap(texture2D(colortex2, uv).rg);
     vec3 lightColor = DetermineLightColor(lightmap);
 
-    float ndotl = max(dot(normal, normalize(sunPosition)), 0.0f);
+    vec3 sunDirection = normalize(sunPosition);
+
+    float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
+    float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
+
+    float ndotl = max(dot(normal, sunDirection), 0.0f) * sunVisibility;
+    ndotl += max(dot(normal, -sunDirection), 0.0f) * moonVisibility;
 
     vec3 diffuse = albedo * (lightColor + ndotl * GetShadow(depth) + Ambient);
 
