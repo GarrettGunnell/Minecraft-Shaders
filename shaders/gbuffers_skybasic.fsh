@@ -1,12 +1,8 @@
 #version 120
 
-varying vec2 uv;
-
-uniform sampler2D texture;
+uniform vec3 skyColor;
 
 void main() {
-    vec4 albedo = texture2D(texture, uv);
-
-    /* DRAWBUFFERS: 3 */
-    gl_FragData[0] = albedo;
+    /* DRAWBUFFERS: 0 */
+    gl_FragData[0] = vec4(skyColor, 1.0f);
 }

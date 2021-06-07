@@ -9,6 +9,7 @@ uniform vec3 moonPosition;
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
 uniform sampler2D colortex2;
+uniform sampler2D colortex3;
 uniform sampler2D depthtex0;
 uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
@@ -24,6 +25,7 @@ uniform mat4 shadowProjection;
 const int colortex0Format = RGBA16;
 const int colortex1Format = RGBA16;
 const int colortex2Format = RGB16;
+const int colortex3Format = RGBA16;
 */
 
 const float sunPathRotation = 10.0f;
