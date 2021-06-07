@@ -25,7 +25,7 @@ const int colortex1Format = RGBA16;
 const int colortex2Format = RGB16;
 */
 
-const float sunPathRotation = -40.0f;
+const float sunPathRotation = 10.0f;
 const int shadowMapResolution = 4096;
 const float shadowBias = 0.000175f;
 
@@ -35,7 +35,7 @@ const int totalSamples = shadowSamplesPerSize * shadowSamplesPerSize;
 
 const int noiseTextureResolution = 128;
 
-const float Ambient = 0.1f;
+const float Ambient = 0.01f;
 
 float AdjustTorchMap(in float torch) {
     const float K = 2.0f;
