@@ -33,7 +33,7 @@ const float sunPathRotation = 10.0f;
 const int shadowMapResolution = 1024;
 const float shadowBias = 0.000175f;
 
-#define SHADOW_SAMPLES 1
+#define SHADOW_SAMPLES 2
 const int shadowSamplesPerSize = 2 * SHADOW_SAMPLES + 1;
 const int totalSamples = shadowSamplesPerSize * shadowSamplesPerSize;
 
@@ -61,7 +61,7 @@ vec2 AdjustLightmap(in vec2 lightmap) {
 }
 
 vec3 DetermineLightColor(in vec2 lightmap) {
-    vec3 torchColor = vec3(1.0f, 0.25f, 0.08f);
+    vec3 torchColor = vec3(1.0f, 1.0f, 1.0f);
 
     vec3 torchLighting = lightmap.x * torchColor;
     vec3 skyLighting = lightmap.y * skyColor;
@@ -140,8 +140,11 @@ void main() {
     float ndotl = max(dot(normal, sunDirection), 0.0f) * sunVisibility;
     ndotl += max(dot(normal, -sunDirection), 0.0f) * moonVisibility;
     ndotl *= luminance(skyColor);
+
+    vec3 attenuation = GetShadow(depth) + (lightColor / 2.0f) + 0.005f;
+    vec3 lighting = ndotl + lightColor + Ambient;
     
-    vec3 diffuse = albedo * (lightColor + ndotl * GetShadow(depth) + Ambient);
+    vec3 diffuse = albedo * lighting * attenuation;
 
     /* DRAWBUFFERS:0 */
     gl_FragData[0] = vec4(diffuse, 1.0f);
