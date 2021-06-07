@@ -5,6 +5,7 @@ varying vec2 uv;
 
 uniform vec3 sunPosition;
 uniform vec3 upPosition;
+uniform vec3 skyColor;
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
@@ -29,7 +30,7 @@ const int colortex3Format = RGBA16;
 */
 
 const float sunPathRotation = 10.0f;
-const int shadowMapResolution = 4096;
+const int shadowMapResolution = 1024;
 const float shadowBias = 0.000175f;
 
 #define SHADOW_SAMPLES 1
@@ -61,7 +62,6 @@ vec2 AdjustLightmap(in vec2 lightmap) {
 
 vec3 DetermineLightColor(in vec2 lightmap) {
     vec3 torchColor = vec3(1.0f, 0.25f, 0.08f);
-    vec3 skyColor = vec3(0.05f, 0.15f, 0.3f);
 
     vec3 torchLighting = lightmap.x * torchColor;
     vec3 skyLighting = lightmap.y * skyColor;
@@ -112,6 +112,10 @@ vec3 GetShadow(float depth) {
     return shadowAccum;
 }
 
+float luminance(vec3 color) {
+    return dot(color, vec3(0.2125f, 0.7153f, 0.0721f));
+}
+
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
     albedo = pow(albedo, vec3(2.2f)); // gamma correct
@@ -135,7 +139,8 @@ void main() {
 
     float ndotl = max(dot(normal, sunDirection), 0.0f) * sunVisibility;
     ndotl += max(dot(normal, -sunDirection), 0.0f) * moonVisibility;
-
+    ndotl *= luminance(skyColor);
+    
     vec3 diffuse = albedo * (lightColor + ndotl * GetShadow(depth) + Ambient);
 
     /* DRAWBUFFERS:0 */
