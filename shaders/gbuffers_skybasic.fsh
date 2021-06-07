@@ -8,5 +8,5 @@ void main() {
     vec4 albedo = texture2D(texture, uv);
 
     /* DRAWBUFFERS: 3 */
-    gl_FragData[3] = albedo;
+    gl_FragData[0] = albedo;
 }
