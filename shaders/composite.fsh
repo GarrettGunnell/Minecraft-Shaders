@@ -140,6 +140,7 @@ void main() {
     float ndotl = max(dot(normal, sunDirection), 0.0f) * sunVisibility;
     ndotl += max(dot(normal, -sunDirection), 0.0f) * moonVisibility;
     ndotl *= luminance(skyColor);
+    ndotl *= lightmap.g;
 
     vec3 attenuation = GetShadow(depth) + (lightColor / 2.0f) + 0.005f;
     vec3 lighting = ndotl + lightColor + Ambient;
