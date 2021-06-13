@@ -8,6 +8,11 @@ uniform sampler2D texture;
 
 uniform vec3 skyColor;
 uniform vec3 sunPosition;
+uniform vec3 upPosition;
+
+float luminance(vec3 color) {
+    return dot(color, vec3(0.2125f, 0.7153f, 0.0721f));
+}
 
 void main() {
     vec4 albedo = texture2D(texture, uv.xy) * color;
@@ -21,7 +26,13 @@ void main() {
     vec3 lightColor = torchLight + skyLight;
 
     vec3 sunDirection = normalize(sunPosition);
-    float ndotl = clamp(dot(normal, sunDirection), 0.0f, 1.0f);
+    float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
+    float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
+
+    float ndotl = clamp(dot(normal, sunDirection), 0.0f, 1.0f) * sunVisibility;
+    ndotl += clamp(dot(normal, -sunDirection), 0.0f, 1.0f) * moonVisibility;
+    ndotl *= luminance(skyColor);
+    ndotl *= lightmap.g;
 
     vec3 lighting = lightColor + ndotl;
 
