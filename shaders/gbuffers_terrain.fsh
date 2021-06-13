@@ -10,6 +10,8 @@ uniform vec3 skyColor;
 uniform vec3 sunPosition;
 uniform vec3 upPosition;
 
+float _Ambient = 0.095f;
+
 float luminance(vec3 color) {
     return dot(color, vec3(0.2125f, 0.7153f, 0.0721f));
 }
@@ -34,12 +36,13 @@ void main() {
     ndotl *= luminance(skyColor);
     ndotl *= lightmap.g;
 
-    vec3 lighting = lightColor + ndotl;
+    vec3 lighting = ndotl + lightColor + _Ambient;
 
     vec3 diffuse = albedo.rgb * lighting;
 
     /* DRAWBUFFERS:012 */
     gl_FragData[0] = vec4(diffuse, albedo.a);
+    //gl_FragData[0] = vec4(lightmap.rg, 0, 0);
     gl_FragData[1] = vec4((normal + 1.0f) / 2.0f, 1.0f);
     gl_FragData[2] = vec4(uv.zw, 0.0f, 1.0f);
 }
