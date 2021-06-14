@@ -14,14 +14,12 @@ uniform vec3 skyColor;
 uniform vec3 sunPosition;
 uniform vec3 upPosition;
 
-float _Ambient = 0.095f;
+const float _Ambient = 0.095f;
 
 const float sunPathRotation = -10.0f;
 const float shadowBias = 0.0002f;
 
 const int noiseTextureResolution = 128;
-
-const float Ambient = 0.01f;
 
 float luminance(vec3 color) {
     return dot(color, vec3(0.2125f, 0.7153f, 0.0721f));
