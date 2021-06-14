@@ -18,7 +18,7 @@ uniform vec3 sunPosition;
 uniform vec3 upPosition;
 
 const float _Ambient = 0.095f;
-const float shadowBias = 0.0002f;
+const float _ShadowBias = 0.0002f;
 
 vec3 sunDirection = normalize(sunPosition);
 float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
@@ -42,7 +42,7 @@ void main() {
 
     vec3 lighting = ndotl + lightColor + _Ambient;
     vec3 clipSpace = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z) * 2.0f - 1.0f;
-    vec3 shadow = GetShadow(clipSpace, shadowBias, noisetex) + (lightColor / 2.0f) + _Ambient;
+    vec3 shadow = GetShadow(clipSpace, _ShadowBias, noisetex) + (lightColor / 2.0f) + _Ambient;
 
     vec3 diffuse = albedo.rgb * lighting * shadow;
 
