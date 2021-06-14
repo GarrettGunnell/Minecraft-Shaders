@@ -1,5 +1,6 @@
 #version 120
 
+#include "settings.glsl"
 #include "common.glsl"
 #include "shadows.glsl"
 
@@ -17,11 +18,7 @@ uniform vec3 sunPosition;
 uniform vec3 upPosition;
 
 const float _Ambient = 0.095f;
-
-const float sunPathRotation = -10.0f;
 const float shadowBias = 0.0002f;
-
-const int noiseTextureResolution = 128;
 
 vec3 sunDirection = normalize(sunPosition);
 float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
