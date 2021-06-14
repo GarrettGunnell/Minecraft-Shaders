@@ -1,4 +1,6 @@
 #version 120
+
+#include "common.glsl"
 #include "shadows.glsl"
 
 varying vec4 uv;
@@ -21,9 +23,9 @@ const float shadowBias = 0.0002f;
 
 const int noiseTextureResolution = 128;
 
-float luminance(vec3 color) {
-    return dot(color, vec3(0.2125f, 0.7153f, 0.0721f));
-}
+vec3 sunDirection = normalize(sunPosition);
+float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
+float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
 
 void main() {
     vec4 albedo = texture2D(texture, uv.xy) * color;
@@ -35,10 +37,6 @@ void main() {
     vec3 skyLight = lightmap.y * skyColor;
 
     vec3 lightColor = torchLight + skyLight;
-
-    vec3 sunDirection = normalize(sunPosition);
-    float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
-    float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
 
     float ndotl = clamp(dot(normal, sunDirection), 0.0f, 1.0f) * sunVisibility;
     ndotl += clamp(dot(normal, -sunDirection), 0.0f, 1.0f) * moonVisibility;
