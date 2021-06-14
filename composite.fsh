@@ -1,11 +1,16 @@
 #version 120
 #include "distort.glsl"
 
-varying vec4 uv;
-varying vec3 normal;
-varying vec4 color;
+varying vec2 uv;
 
-uniform sampler2D texture;
+uniform vec3 sunPosition;
+uniform vec3 upPosition;
+uniform vec3 skyColor;
+
+uniform sampler2D colortex0;
+uniform sampler2D colortex1;
+uniform sampler2D colortex2;
+uniform sampler2D colortex3;
 uniform sampler2D depthtex0;
 uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
@@ -16,17 +21,17 @@ uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 shadowModelView;
 uniform mat4 shadowProjection;
-uniform float viewWidth, viewHeight;
 
-uniform vec3 skyColor;
-uniform vec3 sunPosition;
-uniform vec3 upPosition;
+/*
+const int colortex0Format = RGBA16;
+const int colortex1Format = RGBA16;
+const int colortex2Format = RGB16;
+const int colortex3Format = RGBA16;
+*/
 
-float _Ambient = 0.095f;
-
-const float sunPathRotation = -10.0f;
+const float sunPathRotation = 10.0f;
 const int shadowMapResolution = 1024;
-const float shadowBias = 0.0002f;
+const float shadowBias = 0.000175f;
 
 #define SHADOW_SAMPLES 2
 const int shadowSamplesPerSize = 2 * SHADOW_SAMPLES + 1;
@@ -35,6 +40,34 @@ const int totalSamples = shadowSamplesPerSize * shadowSamplesPerSize;
 const int noiseTextureResolution = 128;
 
 const float Ambient = 0.01f;
+
+float AdjustTorchMap(in float torch) {
+    const float K = 2.0f;
+    const float P = 5.06f;
+
+    return K * pow(torch, P);
+}  
+
+float AdjustSkyMap(in float sky) {
+    return sky * sky * sky * sky;
+}
+
+vec2 AdjustLightmap(in vec2 lightmap) {
+    vec2 newLightmap;
+    newLightmap.r = AdjustTorchMap(lightmap.r);
+    newLightmap.g = AdjustSkyMap(lightmap.g);
+
+    return newLightmap;
+}
+
+vec3 DetermineLightColor(in vec2 lightmap) {
+    vec3 torchColor = vec3(1.0f, 1.0f, 1.0f);
+
+    vec3 torchLighting = lightmap.x * torchColor;
+    vec3 skyLighting = lightmap.y * skyColor;
+
+    return torchLighting + skyLighting;
+}
 
 float Visible(in sampler2D shadowMap, in vec3 uv) {
     return step(uv.z - shadowBias, texture2D(shadowMap, uv.xy).r);
@@ -51,7 +84,7 @@ vec3 shadowColor(in vec3 uv) {
 }
 
 vec3 GetShadow(float depth) {
-    vec3 clipSpace = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z) * 2.0f - 1.0f;
+    vec3 clipSpace = vec3(uv, depth) * 2.0f - 1.0f;
     vec4 viewW = gbufferProjectionInverse * vec4(clipSpace, 1.0f);
     vec3 view = viewW.xyz / viewW.w;
 
@@ -61,7 +94,7 @@ vec3 GetShadow(float depth) {
     shadowSpace.xy = DistortPosition(shadowSpace.xy);
     vec3 shadowUV = shadowSpace.xyz * 0.5f + 0.5f;
 
-    float randomAngle = texture2D(noisetex, uv.xy * 20.0f).r * 100.0f;
+    float randomAngle = texture2D(noisetex, uv * 20.0f).r * 100.0f;
     float cosTheta = cos(randomAngle);
     float sinTheta = sin(randomAngle);
     mat2 rotation = mat2(cosTheta, -sinTheta, sinTheta, cosTheta) / shadowMapResolution;
@@ -84,35 +117,37 @@ float luminance(vec3 color) {
 }
 
 void main() {
-    vec4 albedo = texture2D(texture, uv.xy) * color;
-    albedo = pow(albedo, vec4(2.2));
+    vec3 albedo = texture2D(colortex0, uv).rgb;
+    albedo = pow(albedo, vec3(2.2f)); // gamma correct
+    float depth = texture2D(depthtex0, uv).r;
 
-    float depth = texture2D(depthtex0, uv.xy).r;
+    if (depth == 1.0f) {
+        gl_FragData[0] = vec4(albedo, 1.0f);
+        return;
+    }
 
-    vec2 lightmap = uv.zw;
-    vec3 torchColor = vec3(1.0f);
-    vec3 torchLight = lightmap.x * torchColor;
-    vec3 skyLight = lightmap.y * skyColor;
+    vec3 normal = texture2D(colortex1, uv).rgb;
+    normal = normal * 2.0f - 1.0f; // unpack normal
 
-    vec3 lightColor = torchLight + skyLight;
+    vec2 lightmap = AdjustLightmap(texture2D(colortex2, uv).rg);
+    vec3 lightColor = DetermineLightColor(lightmap);
 
     vec3 sunDirection = normalize(sunPosition);
+
     float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
     float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
 
-    float ndotl = clamp(dot(normal, sunDirection), 0.0f, 1.0f) * sunVisibility;
-    ndotl += clamp(dot(normal, -sunDirection), 0.0f, 1.0f) * moonVisibility;
+    float ndotl = max(dot(normal, sunDirection), 0.0f) * sunVisibility;
+    ndotl += max(dot(normal, -sunDirection), 0.0f) * moonVisibility;
     ndotl *= luminance(skyColor);
     ndotl *= lightmap.g;
 
-    vec3 lighting = ndotl + lightColor + _Ambient;
-    vec3 shadow = GetShadow(depth) + (lightColor / 2.0f) + _Ambient;
+    vec3 attenuation = GetShadow(depth) + (lightColor / 2.0f) + 0.005f;
+    vec3 lighting = ndotl + lightColor + Ambient;
+    
+    vec3 diffuse = albedo * lighting * attenuation;
 
-    vec3 diffuse = albedo.rgb * lighting * shadow;
-
-    /* DRAWBUFFERS:012 */
-    gl_FragData[0] = vec4(diffuse, albedo.a);
+    /* DRAWBUFFERS:0 */
+    gl_FragData[0] = vec4(diffuse, 1.0f);
     //gl_FragData[0] = vec4(lightmap.rg, 0, 0);
-    gl_FragData[1] = vec4((normal + 1.0f) / 2.0f, 1.0f);
-    gl_FragData[2] = vec4(uv.zw, 0.0f, 1.0f);
 }
