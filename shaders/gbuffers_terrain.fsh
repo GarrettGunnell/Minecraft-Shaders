@@ -17,7 +17,7 @@ uniform vec3 skyColor;
 uniform vec3 sunPosition;
 uniform vec3 upPosition;
 
-const float _Ambient = 0.1f;
+const float _Ambient = 0.04f;
 const float _ShadowBias = 0.0002f;
 
 vec3 sunDirection = normalize(sunPosition);
@@ -28,7 +28,7 @@ vec3 sunColor = vec3(0.98f, 0.73f, 0.15f);
 vec3 moonColor = vec3(0.9725f, 0.9765f, 0.9765f);
 
 float AdjustTorchLighting(in float torchLight) {
-    return torchLight * 2;
+    return max(3 * pow(torchLight, 4), 0.0f);
 }
 
 float AdjustSkyLighting(in float skyLight) {
@@ -48,7 +48,7 @@ void main() {
     albedo = pow(albedo, vec4(2.2));
 
     vec2 lightmap = AdjustLightmap(uv.zw);
-    vec3 torchColor = vec3(1.0f);
+    vec3 torchColor = vec3(0.98f, 0.68f, 0.55f);
     vec3 torchLight = lightmap.x * torchColor;
     vec3 skyLight = lightmap.y * skyColor;
 
