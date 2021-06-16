@@ -17,7 +17,7 @@ uniform vec3 skyColor;
 uniform vec3 sunPosition;
 uniform vec3 upPosition;
 
-const float _Ambient = 0.04f;
+const vec3 _Ambient = vec3(0.02f, 0.04f, 0.08f);
 const float _ShadowBias = 0.0002f;
 
 vec3 sunDirection = normalize(sunPosition);
