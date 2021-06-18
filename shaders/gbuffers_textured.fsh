@@ -57,10 +57,9 @@ void main() {
     vec3 lightColor = torchLight + skyLight;
 
     vec3 newNormal = normalize(normal);
-    newNormal.y *= 0.3;
-    vec3 ndotl = sunColor * clamp(dot(newNormal, sunDirection), 0.0f, 1.0f) * sunVisibility;
-    ndotl += moonColor * clamp(dot(newNormal, -sunDirection), 0.0f, 1.0f) * moonVisibility;
-    ndotl *= 4;
+    vec3 ndotl = sunColor * clamp(4 * dot(newNormal, sunDirection), 0.0f, 1.0f) * sunVisibility;
+    ndotl += moonColor * clamp(4 * dot(newNormal, -sunDirection), 0.0f, 1.0f) * moonVisibility;
+    ndotl *= 1.3;
     ndotl *= (luminance(skyColor) + 0.01f);
     ndotl *= lightmap.g;
 
