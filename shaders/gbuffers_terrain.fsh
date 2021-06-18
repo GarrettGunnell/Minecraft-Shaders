@@ -42,9 +42,7 @@ vec2 AdjustLightmap(in vec2 lightmap) {
 void main() {
     vec4 albedo = texture2D(texture, uv.xy) * color;
     albedo = pow(albedo, vec4(2.2));
-
-        //vec4 world = gbufferModelViewInverse * vec4(view, 1.0f);
-
+    
     vec3 sunDirection = mat3(gbufferModelViewInverse) * (sunPosition * 0.01);
     float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
     float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
