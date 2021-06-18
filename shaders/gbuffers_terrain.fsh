@@ -20,10 +20,6 @@ uniform vec3 upPosition;
 const vec3 _Ambient = vec3(0.02f, 0.04f, 0.08f);
 const float _ShadowBias = 0.0002f;
 
-vec3 sunDirection = normalize(sunPosition);
-float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
-float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
-
 vec3 sunColor = vec3(0.98f, 0.73f, 0.15f);
 vec3 moonColor = vec3(0.9725f, 0.9765f, 0.9765f);
 
@@ -47,6 +43,12 @@ void main() {
     vec4 albedo = texture2D(texture, uv.xy) * color;
     albedo = pow(albedo, vec4(2.2));
 
+        //vec4 world = gbufferModelViewInverse * vec4(view, 1.0f);
+
+    vec3 sunDirection = mat3(gbufferModelViewInverse) * (sunPosition * 0.01);
+    float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
+    float moonVisibility = clamp((dot(-sunDirection, upPosition) + 0.05) * 10.0, 0.0, 1.0);
+
     vec2 lightmap = AdjustLightmap(uv.zw);
     vec3 torchColor = vec3(0.98f, 0.68f, 0.55f);
     vec3 torchLight = lightmap.x * torchColor;
@@ -54,8 +56,11 @@ void main() {
 
     vec3 lightColor = torchLight + skyLight;
 
-    vec3 ndotl = sunColor * clamp(dot(normal, sunDirection), 0.0f, 1.0f) * sunVisibility;
-    ndotl += moonColor * clamp(dot(normal, -sunDirection), 0.0f, 1.0f) * moonVisibility;
+    vec3 newNormal = normalize(normal);
+    newNormal.y *= 0.3;
+    vec3 ndotl = sunColor * clamp(dot(newNormal, sunDirection), 0.0f, 1.0f) * sunVisibility;
+    ndotl += moonColor * clamp(dot(newNormal, -sunDirection), 0.0f, 1.0f) * moonVisibility;
+    ndotl *= 4;
     ndotl *= (luminance(skyColor) + 0.01f);
     ndotl *= lightmap.g;
 
