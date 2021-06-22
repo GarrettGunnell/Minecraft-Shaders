@@ -9,7 +9,8 @@ uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
 
 void main() {
-    vec3 sunDirection = mat3(gbufferModelViewInverse) * (sunPosition * 0.01);
+    vec3 sunDirection = sunPosition * 0.01f;
+    float sunVisibility  = clamp((dot( sunDirection, upPosition) + 0.05) * 10, 0.0, 1.0);
     vec4 clipSpace = vec4(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z, 1.0f);
 	vec4 viewW = gbufferProjectionInverse * (clipSpace * 2.0 - 1.0);
     viewW /= viewW.w;
@@ -18,12 +19,15 @@ void main() {
 
 
     float vdotu = clamp(dot(viewSpace.xyz, upPosition), 0.0f, 1.0f);
-    float vdotl = clamp(dot(viewSpace.xyz, sunDirection), -1.0f, 1.0f);
 
-    //vec3 baseGradient = skyColor * exp(-(1.0 - pow(1.0 - max(vdotu, 0.0), 1.5 - 0.5 * vdotl)) / 1.0f);
+    vec3 topDayGradient = vec3(0.60f, 0.68f, 0.85f);
+    vec3 bottomDayGradient = vec3(0.82f, 0.83f, 0.9f);
 
-    vec3 topGradient = vec3(0.48f, 0.76f, 0.85f);
-    vec3 bottomGradient = vec3(0.82f, 0.83f, 0.9f);
+    vec3 topNightGradient = vec3(0.02f, 0.02f, 0.03f);
+    vec3 bottomNightGradient = vec3(0.02f, 0.0f, 0.03f);
+
+    vec3 topGradient = mix(topNightGradient, topDayGradient, sunVisibility);
+    vec3 bottomGradient = mix(bottomNightGradient, bottomDayGradient, sunVisibility);
     vec3 skyCol = mix(bottomGradient, topGradient, vdotu);
 
     skyCol = pow(skyCol, vec3(2.2));
