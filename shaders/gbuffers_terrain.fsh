@@ -12,6 +12,7 @@ uniform sampler2D texture;
 uniform sampler2D noisetex;
 
 uniform float viewWidth, viewHeight;
+uniform float rainStrength;
 
 uniform vec3 skyColor;
 uniform vec3 sunPosition;
@@ -65,7 +66,14 @@ void main() {
     vec3 clipSpace = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z) * 2.0f - 1.0f;
     vec3 shadow = GetShadow(clipSpace, _ShadowBias, noisetex) + (lightColor / 2.0f);
 
-    vec3 diffuse = albedo.rgb * lighting * shadow;
+    vec3 diffuse = albedo.rgb * lighting;
+
+    if (rainStrength > 0.0f) {
+        diffuse = mix(diffuse, vec3(luminance(diffuse)), 0.2 * rainStrength);
+        diffuse *= 0.8;
+    }
+
+    diffuse *= shadow;
 
     /* DRAWBUFFERS:012 */
     gl_FragData[0] = vec4(diffuse, albedo.a);
