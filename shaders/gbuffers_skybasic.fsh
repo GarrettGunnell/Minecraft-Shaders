@@ -31,8 +31,7 @@ void main() {
     vec3 bottomGradient = mix(bottomNightGradient, bottomDayGradient, sunVisibility);
     vec3 skyCol = mix(bottomGradient, topGradient, vdotu);
 
-    if (rainStrength > 0.0f)
-        skyCol *= 1.2 - rainStrength;
+    skyCol *= mix(1.0, 0.25, rainStrength);
 
     skyCol = pow(skyCol, vec3(2.2));
 
