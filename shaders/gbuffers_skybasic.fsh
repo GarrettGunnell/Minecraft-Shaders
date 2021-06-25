@@ -1,4 +1,7 @@
 #version 120
+#include "common.glsl"
+
+varying float star;
 
 uniform vec3 skyColor;
 uniform vec3 upPosition;
@@ -17,8 +20,6 @@ void main() {
     viewW /= viewW.w;
 
     vec3 viewSpace = normalize(viewW.xyz) / 20;
-
-
     float vdotu = clamp(dot(viewSpace.xyz, upPosition) / 2, 0.0f, 1.0f);
 
     vec3 topDayGradient = vec3(0.60f, 0.68f, 0.85f);
@@ -33,8 +34,11 @@ void main() {
 
     skyCol *= mix(1.0, 0.25, rainStrength);
 
+    if (vdotu > 0.0f)
+        skyCol += star;
+
     skyCol = pow(skyCol, vec3(2.2));
 
     /* DRAWBUFFERS: 0 */
-    gl_FragData[0] = vec4(skyCol, 1.0f);
+    gl_FragData[0] = vec4(skyCol, vdotu - rainStrength);
 }
