@@ -19,7 +19,7 @@ void main() {
 	vec4 viewW = gbufferProjectionInverse * (clipSpace * 2.0 - 1.0);
     viewW /= viewW.w;
 
-    vec3 viewSpace = normalize(viewW.xyz) / 20;
+    vec3 viewSpace = normalize(viewW.xyz) / 4;
     float vdotu = clamp(dot(viewSpace.xyz, upPosition) / 2, 0.0f, 1.0f);
 
     vec3 topDayGradient = vec3(0.60f, 0.68f, 0.85f);

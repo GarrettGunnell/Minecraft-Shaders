@@ -7,8 +7,8 @@ uniform sampler2D depthtex0;
 uniform float near, far;
 uniform float rainStrength;
 
-#define FOG_DENSITY 0.009
-#define RAIN_MODIFIER 0.011
+#define FOG_DENSITY 0.008
+#define RAIN_MODIFIER 0.03
 
 /*
 const int colortex0Format = RGBA16;
@@ -38,7 +38,7 @@ void main() {
     depth = LinearDepth(depth);
     float viewDistance = depth * far - near;
 
-    float fogFactor = depth > 0.99999f ? 1.0f : FogExp(viewDistance);
+    float fogFactor = depth > 0.99999f ? 1.0f : FogExp2(viewDistance);
     fogFactor = clamp(fogFactor, 0.0f, 1.0f);
 
 
