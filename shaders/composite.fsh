@@ -8,7 +8,7 @@ uniform float near, far;
 uniform float rainStrength;
 
 #define FOG_DENSITY 0.008
-#define RAIN_MODIFIER 0.03
+#define RAIN_MODIFIER 0.011
 
 /*
 const int colortex0Format = RGBA16;
@@ -18,14 +18,12 @@ float LinearDepth(float z) {
     return 1.0 / ((1 - far / near) * z + (far / near));
 }
 
-float FogExp(float viewDistance) {
-    float density = FOG_DENSITY + (RAIN_MODIFIER * rainStrength);
+float FogExp(float viewDistance, float density) {
     float factor = viewDistance * (density / log(2.0f));
     return exp2(-factor);
 }
 
-float FogExp2(float viewDistance) {
-    float density = FOG_DENSITY + (RAIN_MODIFIER * rainStrength);
+float FogExp2(float viewDistance, float density) {
     float factor = viewDistance * (density / sqrt(log(2.0f)));
     return exp2(-factor * factor);
 }
@@ -38,8 +36,15 @@ void main() {
     depth = LinearDepth(depth);
     float viewDistance = depth * far - near;
 
-    float fogFactor = depth > 0.99999f ? 1.0f : FogExp2(viewDistance);
-    fogFactor = clamp(fogFactor, 0.0f, 1.0f);
+    float density = FOG_DENSITY + (RAIN_MODIFIER * rainStrength);
+
+    if (depth > 0.9999f && rainStrength < 0.99f)
+        density *= 0.5f;
+
+    float fogFactor1 = FogExp(viewDistance, density);
+    float fogFactor2 = FogExp2(viewDistance, density);
+    
+    float fogFactor = clamp(mix(fogFactor1, fogFactor2, rainStrength), 0.0f, 1.0f);
 
 
     vec3 fogColor = vec3(0.82f, 0.83f, 0.9f);

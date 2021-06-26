@@ -22,7 +22,7 @@ void main() {
     vec3 viewSpace = normalize(viewW.xyz) / 4;
     float vdotu = clamp(dot(viewSpace.xyz, upPosition) / 2, 0.0f, 1.0f);
 
-    vec3 topDayGradient = vec3(0.60f, 0.68f, 0.85f);
+    vec3 topDayGradient = vec3(0.40f, 0.48f, 0.65f);
     vec3 bottomDayGradient = vec3(0.82f, 0.83f, 0.9f);
 
     vec3 topNightGradient = vec3(0.02f, 0.02f, 0.03f);
