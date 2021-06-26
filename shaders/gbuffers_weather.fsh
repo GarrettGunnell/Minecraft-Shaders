@@ -8,8 +8,9 @@ uniform sampler2D texture;
 
 void main() {
     vec4 albedo = texture2D(texture, uv.xy) * color;
+    albedo.rgb = pow(albedo.rgb, vec3(2.2));
 
     /* DRAWBUFFERS:02 */
     gl_FragData[0] = albedo;
-    gl_FragData[1] = vec4(uv.zw, 0.0f, 1.0f);
+    gl_FragData[1] = vec4(vec3(1.0f), 1.0f); // fog mask
 }

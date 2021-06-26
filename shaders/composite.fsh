@@ -2,6 +2,7 @@
 
 varying vec2 uv;
 uniform sampler2D colortex0;
+uniform sampler2D colortex2;
 uniform sampler2D depthtex0;
 
 uniform float near, far;
@@ -31,6 +32,8 @@ float FogExp2(float viewDistance, float density) {
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
     albedo = pow(albedo, vec3(1 / 2.2));
+    
+    float mask = texture2D(colortex2, uv).r;
     float depth = texture2D(depthtex0, uv).r;
 
     depth = LinearDepth(depth);
@@ -54,5 +57,5 @@ void main() {
     fogged = pow(fogged, vec3(2.2));
 
     gl_FragColor = vec4(fogged, 1.0f);
-    //gl_FragColor = vec4(albedo, 1.0f);
+    gl_FragColor = vec4(vec3(mask), 1.0f);
 }
