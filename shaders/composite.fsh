@@ -12,7 +12,8 @@ uniform float rainStrength;
 #define RAIN_MODIFIER 0.011
 
 /*
-const int colortex0Format = RGBA16;
+const int colortex0Format = RGBA32F;
+const int colortex2Format = R8;
 */
 
 float LinearDepth(float z) {

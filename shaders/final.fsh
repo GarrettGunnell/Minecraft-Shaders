@@ -4,7 +4,7 @@ varying vec2 uv;
 uniform sampler2D colortex0;
 
 /*
-const int colortex0Format = RGBA16;
+const int colortex0Format = RGBA32F;
 */
 
 void main() {
