@@ -8,6 +8,9 @@ uniform float rainStrength;
 void main() {
     vec4 albedo = texture2D(texture, uv);
     albedo = pow(albedo, vec4(2.2));
+    
+    if (albedo.r != albedo.g && albedo.g != albedo.b)
+        albedo.rgb += 0.2;
 
     albedo.a = 1 - rainStrength;
 
