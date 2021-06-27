@@ -11,7 +11,7 @@ void main() {
     
     float mask = 0.0f;
     if (albedo.r != albedo.g && albedo.g != albedo.b)
-        mask = 1.0f;
+        mask = 1.0f * (1 - rainStrength);
 
     albedo.a = 1 - rainStrength;
 

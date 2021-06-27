@@ -48,7 +48,7 @@ void main() {
     float fogFactor1 = FogExp(viewDistance, density);
     float fogFactor2 = FogExp2(viewDistance, density);
     
-    float fogFactor = 1 - clamp(mix(fogFactor1, fogFactor2, rainStrength), 0.0f, 1.0f);
+    float fogFactor = 1 - clamp(mix(fogFactor1, (fogFactor2 + fogFactor1) / 2, rainStrength), 0.0f, 1.0f);
     fogFactor *= mask;
 
     vec3 fogColor = vec3(0.82f, 0.83f, 0.9f);
