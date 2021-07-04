@@ -43,7 +43,7 @@ void main() {
     float density = FOG_DENSITY + (RAIN_MODIFIER * rainStrength);
 
     if (depth > 0.99999f)
-        density *= mix(0.33f, 1.0f, rainStrength);
+        density *= mix(0.2f, 1.0f, rainStrength);
 
     float fogFactor1 = FogExp(viewDistance, density);
     float fogFactor2 = FogExp2(viewDistance, density);
