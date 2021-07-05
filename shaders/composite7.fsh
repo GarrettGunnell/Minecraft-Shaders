@@ -57,6 +57,6 @@ void main() {
 
     fogged = pow(fogged, vec3(2.2));
 
-    gl_FragColor = vec4(pow(albedo, vec3(2.2)), 1.0f);
+    gl_FragColor = vec4(fogged, 1.0f);
     //gl_FragColor = vec4(vec3(mask), 1.0f);
 }

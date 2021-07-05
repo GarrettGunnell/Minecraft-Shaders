@@ -24,8 +24,6 @@ const float _ShadowBias = 0.0002f;
 vec3 sunColor = vec3(0.98f, 0.73f, 0.15f);
 vec3 moonColor = vec3(0.9725f, 0.9765f, 0.9765f);
 
-#define BLOOM_LUMINANCE_THRESHOLD 0.4
-
 float AdjustTorchLighting(in float torchLight) {
     return max(3 * pow(torchLight, 4), 0.0f);
 }
@@ -72,8 +70,7 @@ void main() {
     vec3 diffuse = albedo.rgb * lighting;
     diffuse *= shadow;
 
-    /* DRAWBUFFERS:04 */
+    /* DRAWBUFFERS:0 */
     gl_FragData[0] = vec4(diffuse, albedo.a);
     //gl_FragData[0] = vec4(lightmap.rg, 0, 0);
-    gl_FragData[1] = vec4(luminance(diffuse) >= BLOOM_LUMINANCE_THRESHOLD ? diffuse : vec3(0.0f), albedo.a); // Bloom
 }
