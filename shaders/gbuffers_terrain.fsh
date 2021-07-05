@@ -70,9 +70,7 @@ void main() {
     vec3 diffuse = albedo.rgb * lighting;
     diffuse *= shadow;
 
-    /* DRAWBUFFERS:012 */
+    /* DRAWBUFFERS:0 */
     gl_FragData[0] = vec4(diffuse, albedo.a);
     //gl_FragData[0] = vec4(lightmap.rg, 0, 0);
-    gl_FragData[1] = vec4((normal + 1.0f) / 2.0f, 1.0f);
-    gl_FragData[2] = vec4(uv.zw, 0.0f, 1.0f);
 }
