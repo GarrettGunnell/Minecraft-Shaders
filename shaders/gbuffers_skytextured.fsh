@@ -15,7 +15,8 @@ void main() {
 
     albedo.a = 1 - rainStrength;
 
-    /* DRAWBUFFERS: 02 */
+    /* DRAWBUFFERS: 024 */
     gl_FragData[0] = albedo;
     gl_FragData[1] = vec4(mask); // fog mask
+    gl_FragData[2] = mask > 0.0f ? albedo : vec4(0.0f);
 }
