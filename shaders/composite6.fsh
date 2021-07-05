@@ -34,22 +34,20 @@ void main() {
     for (int x = lower; x <= upper; ++x) {
         float gauss = gaussian(x);
         kernelSum += gauss;
-        vec3 texSample = texture2D(colortex0, uv + vec2(texelSize.x * x, 0.0)).rgb;
-        col += gauss * texSample;
+        col += gauss * texture2D(colortex0, uv + vec2(texelSize.x * x, 0.0)).rgb;
     }
 
     for (int y = lower; y <= upper; ++y) {
         float gauss = gaussian(y);
         kernelSum += gauss;
-        vec3 texSample = texture2D(colortex0, uv + vec2(0.0, texelSize.y * y)).rgb;
-        col += gauss * texSample;
+        col += gauss * texture2D(colortex0, uv + vec2(0.0, texelSize.y * y)).rgb;
     }
 
     col /= kernelSum;
 
     vec3 albedo = texture2D(colortex0, uv).rgb;
     albedo = pow(albedo, vec3(1.0f / 2.2f));
-    albedo += col.rgb * 0.5;
+    albedo += col.rgb * mix(0.5, 0.7, luminance(col));
     albedo = pow(albedo, vec3(2.2f));
 
     /* DRAWBUFFERS:0 */

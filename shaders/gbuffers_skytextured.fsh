@@ -17,5 +17,4 @@ void main() {
 
     /* DRAWBUFFERS: 02 */
     gl_FragData[0] = albedo;
-    gl_FragData[1] = vec4(mask); // fog mask
 }
