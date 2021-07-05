@@ -32,7 +32,6 @@ float FogExp2(float viewDistance, float density) {
 
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
-    albedo = pow(albedo, vec3(1 / 2.2));
     
     float mask = 1 - texture2D(colortex2, uv).r;
     float depth = texture2D(depthtex0, uv).r;
@@ -54,8 +53,6 @@ void main() {
     vec3 fogColor = vec3(0.82f, 0.83f, 0.9f);
     fogColor *= mix(1.0, 0.25, rainStrength);
     vec3 fogged = mix(albedo, fogColor, fogFactor);
-
-    fogged = pow(fogged, vec3(2.2));
 
     gl_FragColor = vec4(fogged, 1.0f);
     //gl_FragColor = vec4(vec3(mask), 1.0f);

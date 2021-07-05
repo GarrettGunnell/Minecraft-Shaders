@@ -46,9 +46,7 @@ void main() {
     col /= kernelSum;
 
     vec3 albedo = texture2D(colortex0, uv).rgb;
-    albedo = pow(albedo, vec3(1.0f / 2.2f));
     albedo += col.rgb * mix(0.5, 0.7, luminance(col));
-    albedo = pow(albedo, vec3(2.2f));
 
     /* DRAWBUFFERS:0 */
     gl_FragColor = vec4(albedo, 1.0f);
