@@ -5,6 +5,7 @@ varying vec2 uv;
 uniform sampler2D colortex0;
 uniform sampler2D colortex4;
 
+uniform float rainStrength;
 uniform float viewWidth, viewHeight;
 vec2 texelSize = vec2(1.0 / viewWidth, 1.0 / viewHeight);
 
@@ -46,7 +47,7 @@ void main() {
     col /= kernelSum;
 
     vec3 albedo = texture2D(colortex0, uv).rgb;
-    albedo += col.rgb * mix(0.5, 0.7, luminance(col));
+    albedo += col.rgb * mix(0.5, 0.7, luminance(col)) * (1 - rainStrength);
 
     /* DRAWBUFFERS:0 */
     gl_FragColor = vec4(albedo, 1.0f);

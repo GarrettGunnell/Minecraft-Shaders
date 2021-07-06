@@ -8,7 +8,7 @@ uniform sampler2D depthtex0;
 uniform float near, far;
 uniform float rainStrength;
 
-#define FOG_DENSITY 0.009
+#define FOG_DENSITY 0.01
 #define RAIN_MODIFIER 0.011
 
 /*
