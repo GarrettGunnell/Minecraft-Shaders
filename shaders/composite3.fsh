@@ -11,7 +11,7 @@ const int colortex0Format = RGBA32F;
 const int colortex4Format = RGBA32F;
 */
 
-const float sharpness = 0.5f;
+const float sharpness = 0.6f;
 
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;

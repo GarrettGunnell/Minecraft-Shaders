@@ -8,8 +8,8 @@ uniform sampler2D colortex0;
 const int colortex0Format = RGBA32F;
 */
 
-const float contrast = 0.85;
-const float brightness = 0.02;
+const float contrast = 1.15f;
+const float brightness = 0.25f;
 
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
