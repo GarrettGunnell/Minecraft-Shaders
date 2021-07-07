@@ -64,7 +64,7 @@ void main() {
 
     vec3 lighting = ndotl + lightColor + _Ambient;
     vec3 clipSpace = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z) * 2.0f - 1.0f;
-    vec3 shadow = GetShadow(clipSpace, _ShadowBias, noisetex) + (lightColor / 2.0f);
+    vec3 shadow = GetShadow(clipSpace, _ShadowBias, noisetex) + (lightColor / 10.0f);
     shadow = mix(shadow, 0.2f + (lightColor / 2.0f), rainStrength);
 
     vec3 diffuse = albedo.rgb * lighting;

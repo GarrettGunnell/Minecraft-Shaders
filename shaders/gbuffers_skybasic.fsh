@@ -33,6 +33,8 @@ void main() {
     vec3 skyCol = mix(bottomGradient, topGradient, vdotu);
 
     skyCol *= mix(1.0, 0.25, rainStrength);
+    vec3 desaturated = vec3(luminance(skyCol));
+    skyCol = mix(desaturated, skyCol, 2.0f);
 
     if (vdotu > 0.0f)
         skyCol += star;

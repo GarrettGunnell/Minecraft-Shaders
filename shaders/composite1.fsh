@@ -8,7 +8,7 @@ uniform sampler2D colortex0;
 const int colortex0Format = RGBA32F;
 */
 
-const float saturation = 1.5f;
+const float saturation = 1.65f;
 
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
