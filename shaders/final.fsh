@@ -45,6 +45,7 @@ vec3 aces_fitted(vec3 v)
 
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
+    albedo = pow(albedo, vec3(1.5f));
 
     albedo = aces_fitted(albedo);
 

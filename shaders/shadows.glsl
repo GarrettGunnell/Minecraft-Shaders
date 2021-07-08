@@ -1,6 +1,6 @@
 #include "distort.glsl"
 
-#define SHADOW_SAMPLES 2
+#define SHADOW_SAMPLES 3
 const int shadowSamplesPerSize = 2 * SHADOW_SAMPLES + 1;
 const int totalSamples = shadowSamplesPerSize * shadowSamplesPerSize;
 
