@@ -54,7 +54,8 @@ vec3 CalculateLighting(vec3 albedo, vec3 normal, vec2 lightmapCoords, vec3 fragC
     vec3 shadow = GetShadow(clipSpace, _ShadowBias, noisetex) + (lightColor / 10.0f);
     shadow = mix(shadow, 0.2f + (lightColor / 2.0f), rainStrength);
 
-    vec3 diffuse = albedo.rgb * lighting;
+    vec3 diffuse = albedo.rgb;
+    diffuse *= lighting;
     diffuse *= shadow;
 
     return diffuse;
