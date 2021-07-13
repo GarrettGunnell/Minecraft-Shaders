@@ -42,8 +42,9 @@ vec3 aces_fitted(vec3 v) {
 void main() {
     vec3 albedo = texture2D(colortex0, uv).rgb;
     albedo = pow(albedo, vec3(1.5f));
-
+    albedo.b = max(albedo.b, 0.0f);
+    
     albedo = aces_fitted(albedo);
-
+        
     gl_FragColor = vec4(albedo, 1.0f);
 }
